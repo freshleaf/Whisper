@@ -1,0 +1,79 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+    defaultConfig {
+        applicationId "io.buzznerd.varys.app"
+        minSdkVersion 16
+        targetSdkVersion 25
+        versionCode 1
+        versionName "0.1.2"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        jackOptions {
+            enabled false
+        }
+    }
+    compileOptions {
+        // Java 8 need to enable jack, somehow it cause realm exception
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    lintOptions {
+        quiet false
+        abortOnError false
+        ignoreWarnings false
+    }
+
+    signingConfigs {
+        debug {
+            // No debug config
+        }
+
+        release {
+            // value from gradle.properties
+            storeFile file(OKCHEM_STORE_FILE)
+            storePassword OKCHEM_STORE_PASSWORD
+            keyAlias OKCHEM_KEY_ALIAS
+            keyPassword OKCHEM_KEY_PASSWORD
+        }
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-debug'
+            minifyEnabled false
+            zipAlignEnabled false
+            shrinkResources false
+        }
+        release {
+            ndk {
+                // the .so to add
+                abiFilters 'armeabi', 'armeabi-v7a', 'armeabi-v8a', 'x86'
+                // available option:  'x86_64', 'mips', 'mips64'
+            }
+            minifyEnabled true
+            zipAlignEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile project(path: ':whisper')
+    compile 'com.android.support:appcompat-v7:25.0.0'
+    // log pretty
+    compile 'com.orhanobut:logger:1.15'
+    // test
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    testCompile 'junit:junit:4.12'
+    // umeng
+    compile 'com.umeng.analytics:analytics:latest.integration'
+    compile 'com.android.support:design:25.0.0'
+}
